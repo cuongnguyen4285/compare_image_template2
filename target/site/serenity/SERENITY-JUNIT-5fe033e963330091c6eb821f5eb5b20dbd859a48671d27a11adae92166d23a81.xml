@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuite errors="1" failures="0" name="features.WhenComparingImage" skipped="0" tests="1" time="8.97" timestamp="2020-08-18 03:20:14"><testcase classname="features.WhenComparingImage" name="When comparing image then should see compare result"><error message="Provided data element number (3758080) should be multiple of the Mat channels count (3)" type="java.lang.UnsupportedOperationException">Provided data element number (3758080) should be multiple of the Mat channels count (3)</error><system-err>Provided data element number (3758080) should be multiple of the Mat channels count (3)
+org.opencv.core.Mat.put(Mat.java:893)
+utils.OpenCVComparisonUtil.conv_Mat(OpenCVComparisonUtil.java:105)
+utils.OpenCVComparisonUtil.compare_image(OpenCVComparisonUtil.java:79)
+features.WhenComparingImage.whenComparingImage_thenShouldSeeCompareResult(WhenComparingImage.java:39)
+</system-err></testcase></testsuite>
