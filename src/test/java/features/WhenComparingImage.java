@@ -18,20 +18,22 @@ import utils.OpenCVComparisonUtil;
 import utils.ShutterBugImageUtil;
 
 @RunWith(SerenityRunner.class)
-public class WhenComparingImage extends Hook{
+public class WhenComparingImage extends Hook {
 
     @Steps
     HomePage homePage;
 
     @Test
-    public void whenComparingImage_thenShouldSeeCompareResult(){
+    public void whenComparingImage_thenShouldSeeCompareResult() {
 
-        homePage.navigateTo("https://dantri.com.vn/nhip-song-tre/thieu-nu-xinh-dep-doi-non-la-khoe-sac-voi-hoa-ban-20190214111529691.htm#&gid=1&pid=1");
+        homePage.navigateTo(
+                "https://dantri.com.vn/nhip-song-tre/thieu-nu-xinh-dep-doi-non-la-khoe-sac-voi-hoa-ban-20190214111529691.htm#&gid=1&pid=1");
 
         BufferedImage expectedScreenshot = ShutterBugImageUtil
                 .takeScreenshot(DriverFactory.getWebDriver(), Constants.EXPECTED_IMAGE_FILE_PATH, "expectedimage");
 
-        homePage.navigateTo("https://dantri.com.vn/nhip-song-tre/thieu-nu-xinh-dep-doi-non-la-khoe-sac-voi-hoa-ban-20190214111529691.htm#&gid=1&pid=1");
+        homePage.navigateTo(
+                "https://dantri.com.vn/nhip-song-tre/thieu-nu-xinh-dep-doi-non-la-khoe-sac-voi-hoa-ban-20190214111529691.htm#&gid=1&pid=1");
 
         BufferedImage actualScreenshot = ShutterBugImageUtil
                 .takeScreenshot(DriverFactory.getWebDriver(), Constants.ACTUAL_IMAGE_FILE_PATH, "actualimage");

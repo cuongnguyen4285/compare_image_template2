@@ -65,8 +65,8 @@ public class OpenCVComparisonUtil {
         //Draw rectangle on result image
         Imgproc.rectangle(source, matchLoc, new Point(matchLoc.x + template.cols(),
                 matchLoc.y + template.rows()), new Scalar(46, 204, 113), 20);
-        Imgcodecs.imwrite("dist/matchImage.jpg", source);
-        if (mmr.maxVal < 9) {
+        Imgcodecs.imwrite("src/main/resources/images/matchimage/matchImage1.jpg", source);
+        if (mmr.maxVal < 0.9) {
             matchImage = false;
             System.out.println("Image doesn't match");
         }
@@ -125,7 +125,7 @@ public class OpenCVComparisonUtil {
         Mat mat1 = new Mat(convertedImage.getHeight(), convertedImage.getWidth(), CvType.CV_8UC3);
         Imgproc.cvtColor(mat, mat1, Imgproc.COLOR_RGB2HSV);
 
-        return mat1;
+        return mat;
     }
 
 }
