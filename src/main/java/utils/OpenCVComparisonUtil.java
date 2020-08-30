@@ -64,7 +64,7 @@ public class OpenCVComparisonUtil {
 
         //Draw rectangle on result image
         Imgproc.rectangle(source, matchLoc, new Point(matchLoc.x + template.cols(),
-                matchLoc.y + template.rows()), new Scalar(46, 204, 113), 20);
+                matchLoc.y + template.rows()), new Scalar(46, 204, 113), 10);
         Imgcodecs.imwrite("src/main/resources/images/matchimage/matchImage1.jpg", source);
         if (mmr.maxVal < 0.9) {
             matchImage = false;
