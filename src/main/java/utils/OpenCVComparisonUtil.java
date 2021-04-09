@@ -1,9 +1,12 @@
 package utils;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.Arrays;
 import java.util.Collections;
+
+import javax.swing.ImageIcon;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -12,65 +15,73 @@ import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 public class OpenCVComparisonUtil {
 
     public static float[] getTemplateImageCoord(String sourcePath, String templatePath) {
-        Mat source = null;
-        Mat template = null;
+        Mat source = Imgcodecs.imread(sourcePath);
+        Mat template = Imgcodecs.imread(templatePath);
+        Mat result = new Mat();
+        int matchMethod = Imgproc.TM_CCOEFF_NORMED;
 
-        source = Imgcodecs.imread(sourcePath);
-        template = Imgcodecs.imread(templatePath);
-
-        Mat outputImage = new Mat();
-        int machMethod = Imgproc.TM_CCOEFF_NORMED;
         //Template matching method
-        Imgproc.matchTemplate(source, template, outputImage, machMethod);
+        Imgproc.matchTemplate(source, template, result, matchMethod);
 
-        Core.MinMaxLocResult mmr = Core.minMaxLoc(outputImage);
-        Point matchLoc = mmr.maxLoc;
+        Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
+        Point matchLoc;
+        if (matchMethod == Imgproc.TM_SQDIFF || matchMethod == Imgproc.TM_SQDIFF_NORMED) {
+            matchLoc = mmr.minLoc;
+        } else {
+            matchLoc = mmr.maxLoc;
+        }
 
         //Draw rectangle on result image
         Imgproc.rectangle(source, matchLoc, new Point(matchLoc.x + template.cols(),
-                matchLoc.y + template.rows()), new Scalar(46, 204, 113), 20);
-        Imgcodecs.imwrite("dist/templateImageCoord.jpg", source);
-        float[] coords = {(float) matchLoc.x, (float) matchLoc.y, template.cols(), template.rows()};
+                                                      matchLoc.y + template.rows()), new Scalar(46, 204, 113), 20);
+//        Imgcodecs.imwrite("dist/templateImageCoord.jpg", source);
+
+        float[] coords = { (float) matchLoc.x, (float) matchLoc.y, template.cols(), template.rows() };
         System.out.println(Arrays.toString(coords));
         return coords;
     }
 
     public static boolean matchingImage(String sourcePath, String templatePath) {
-        boolean matchImage = true;
+        boolean isMatch = false;
+        Mat source = Imgcodecs.imread(sourcePath);
+        Mat template = Imgcodecs.imread(templatePath);
+        Mat result = new Mat();
+        int matchMethod = Imgproc.TM_CCOEFF_NORMED;
 
-        Mat source = null;
-        Mat template = null;
-
-        source = Imgcodecs.imread(sourcePath);
-        template = Imgcodecs.imread(templatePath);
-
-        Mat outputImage = new Mat();
-        int machMethod = Imgproc.TM_CCOEFF_NORMED;
         //Template matching method
-        Imgproc.matchTemplate(source, template, outputImage, machMethod);
+        Imgproc.matchTemplate(source, template, result, matchMethod);
 
-        Core.MinMaxLocResult mmr = Core.minMaxLoc(outputImage);
-        Point matchLoc = mmr.maxLoc;
+        Core.MinMaxLocResult mmr = Core.minMaxLoc(result);
+        Point matchLoc;
+
+        if (matchMethod == Imgproc.TM_SQDIFF || matchMethod == Imgproc.TM_SQDIFF_NORMED) {
+            matchLoc = mmr.minLoc;
+        } else {
+            matchLoc = mmr.maxLoc;
+        }
 
         //Change minVal and maxVal to 0 and 1
-        Core.normalize(outputImage, outputImage, 0, 1, Core.NORM_MINMAX, -1, new Mat());
+        Core.normalize(result, result, 0, 1, Core.NORM_MINMAX, -1, new Mat());
         System.out.println("Min val: " + mmr.minVal + "Max val: " + mmr.maxVal);
 
         //Draw rectangle on result image
-        Imgproc.rectangle(source, matchLoc, new Point(matchLoc.x + template.cols(),
-                matchLoc.y + template.rows()), new Scalar(46, 204, 113), 10);
-        Imgcodecs.imwrite("src/main/resources/images/matchimage/matchImage1.jpg", source);
-        if (mmr.maxVal < 0.9) {
-            matchImage = false;
-            System.out.println("Image doesn't match");
+        Imgproc.rectangle(source, matchLoc,
+                          new Point(matchLoc.x + template.cols(), matchLoc.y + template.rows()), new Scalar(46, 204, 113),
+                          10);
+        Imgcodecs.imwrite("src/main/resources/images/matchimage/debug.jpg", source);
+
+        if (mmr.maxVal > 0.75) {
+            isMatch = true;
+            System.out.println("Image matches");
         }
-        return matchImage;
+        return isMatch;
     }
 
     public static boolean compare_image(BufferedImage img_1, BufferedImage img_2) {
@@ -86,9 +97,9 @@ public class OpenCVComparisonUtil {
         MatOfInt histSize = new MatOfInt(25);
 
         Imgproc.calcHist(Collections.singletonList(mat_1), new MatOfInt(0),
-                new Mat(), hist_1, histSize, ranges);
+                         new Mat(), hist_1, histSize, ranges);
         Imgproc.calcHist(Collections.singletonList(mat_2), new MatOfInt(0),
-                new Mat(), hist_2, histSize, ranges);
+                         new Mat(), hist_2, histSize, ranges);
 
         double similarityDiff = Imgproc.compareHist(hist_1, hist_2, Imgproc.CV_COMP_CORREL);
         System.out.println("Similarity different: " + similarityDiff);
@@ -115,7 +126,7 @@ public class OpenCVComparisonUtil {
     private static Mat conv_Mat(BufferedImage img) {
         // covert to 3 bytes BGR
         BufferedImage convertedImage = new BufferedImage(img.getWidth(), img.getHeight(),
-                BufferedImage.TYPE_3BYTE_BGR);
+                                                         BufferedImage.TYPE_3BYTE_BGR);
         convertedImage.getGraphics().drawImage(img, 0, 0, null);
 
         byte[] data = ((DataBufferByte) convertedImage.getRaster().getDataBuffer()).getData();
